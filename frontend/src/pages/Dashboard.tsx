@@ -1,11 +1,11 @@
-import EmployeeTable from "../components/EmployeeTable";
+import EmployeeTable from '../components/EmployeeTable'
 
 const Dashboard = () => {
   return (
     <div>
       <EmployeeTable />
     </div>
-  );
-};
+  )
+}
 
-export default Dashboard;
+export default Dashboard

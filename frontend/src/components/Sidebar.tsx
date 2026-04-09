@@ -65,7 +65,7 @@ const Sidebar = () => {
         </nav>
       </div>
     </aside>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar

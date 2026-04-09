@@ -1,61 +1,63 @@
-import { createColumnHelper } from "@tanstack/react-table";
-import { useEffect, useState } from "react";
-import { LuChevronDown, LuPencil, LuSearch, LuTrash2 } from "react-icons/lu";
-import { MdAdd } from "react-icons/md";
-import Table from "./Table";
-import Modal from "./Modal";
-import AddEmployeeModal from "./AddEmployeeModal";
+import { createColumnHelper } from '@tanstack/react-table'
+import { useEffect, useState } from 'react'
+import { LuChevronDown, LuPencil, LuSearch, LuTrash2 } from 'react-icons/lu'
+import { MdAdd } from 'react-icons/md'
+import Table from './Table'
+import Modal from './Modal'
+import AddEmployeeModal from './AddEmployeeModal'
 
 export interface IAddEmployeeForm {
-  name: string;
-  age: number;
-  email: string;
-  position: string;
-  office: string;
-  phone: string;
-  address: string;
-  status: string;
-  avatar: FileList;
-  actions: string;
+  name: string
+  first_name: string
+  last_name: string
+  age: number
+  email: string
+  position: string
+  office: string
+  phone: string
+  address: string
+  salary: string
+  avatar: FileList
+  actions: string
 }
 
-const columnHelper = createColumnHelper<IAddEmployeeForm>();
+const columnHelper = createColumnHelper<IAddEmployeeForm>()
 
 const columns = [
-  columnHelper.accessor("name", {
+  columnHelper.accessor('name', {
     cell: (info) => {
       return (
         <>
           <p className="block text-theme-sm font-medium text-gray-800 dark:text-white/90">
-            {info.row.original.name}
+            {`${info.row.original.first_name}  ${info.row.original.last_name}`}
           </p>
 
           <span className="text-sm text-gray-500 dark:text-gray-400">
             {info.row.original.email}
           </span>
         </>
-      );
+      )
     },
   }),
 
-  columnHelper.accessor("age", {
+  columnHelper.accessor('age', {
     header: () => <span>age</span>,
   }),
-  columnHelper.accessor("position", {
+  columnHelper.accessor('position', {
     header: () => <span>Position</span>,
   }),
-  columnHelper.accessor("office", {
+  columnHelper.accessor('office', {
     header: () => <span>Office</span>,
   }),
-  columnHelper.accessor("status", {
-    header: () => <span>Status</span>,
+  columnHelper.accessor('salary', {
+    header: () => <span>Salary</span>,
   }),
 
-  columnHelper.accessor("phone", {
+  columnHelper.accessor('phone', {
     header: () => <span>Phone</span>,
   }),
 
-  columnHelper.accessor("actions", {
+  columnHelper.accessor('actions', {
     header: () => <span>Actions</span>,
     cell: () => (
       <div className="flex items-center gap-2">
@@ -68,35 +70,35 @@ const columns = [
       </div>
     ),
   }),
-];
+]
 
 const EmployeeTable = () => {
-  const [employees, setEmployees] = useState<IAddEmployeeForm[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [employees, setEmployees] = useState<IAddEmployeeForm[]>([])
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   const fetchEmployees = async () => {
     try {
-      const response = await fetch("http://localhost:4000/api/employees");
+      const response = await fetch('http://localhost:4000/api/employees')
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error('Network response was not ok')
       }
-      const data = await response.json();
-      setEmployees(data);
+      const data = await response.json()
+      setEmployees(data)
     } catch (error) {
-      console.error("Error fetching employees:", error);
+      console.error('Error fetching employees:', error)
     }
-  };
+  }
 
   useEffect(() => {
-    fetchEmployees();
-  }, []);
+    fetchEmployees()
+  }, [])
 
   const handleModalClose = () => {
-    setIsModalOpen(false);
-  };
+    setIsModalOpen(false)
+  }
   const handleModalOpen = () => {
-    setIsModalOpen(true);
-  };
+    setIsModalOpen(true)
+  }
   return (
     <>
       <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
@@ -177,7 +179,7 @@ const EmployeeTable = () => {
         </div>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default EmployeeTable;
+export default EmployeeTable

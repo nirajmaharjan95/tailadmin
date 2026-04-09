@@ -1,8 +1,8 @@
-import Header from "./components/Header";
-import Sidebar from "./components/Sidebar";
+import Header from './components/Header'
+import Sidebar from './components/Sidebar'
 
 interface Iprops {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 const Layout = ({ children }: Iprops) => {
@@ -21,7 +21,7 @@ const Layout = ({ children }: Iprops) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Layout;
+export default Layout

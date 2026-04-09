@@ -1,4 +1,4 @@
-import { LuEye } from "react-icons/lu";
+import { LuEye } from 'react-icons/lu'
 
 const Signup = () => {
   return (
@@ -73,7 +73,8 @@ const Signup = () => {
                     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                       <div className="sm:col-span-1">
                         <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                          First Name<span className="text-error-500">*</span>
+                          First Name
+                          <span className="text-error-500">*</span>
                         </label>
                         <input
                           type="text"
@@ -85,7 +86,8 @@ const Signup = () => {
                       </div>
                       <div className="sm:col-span-1">
                         <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                          Last Name<span className="text-error-500">*</span>
+                          Last Name
+                          <span className="text-error-500">*</span>
                         </label>
                         <input
                           type="text"
@@ -98,7 +100,8 @@ const Signup = () => {
                     </div>
                     <div>
                       <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Email<span className="text-error-500">*</span>
+                        Email
+                        <span className="text-error-500">*</span>
                       </label>
                       <input
                         type="email"
@@ -110,7 +113,8 @@ const Signup = () => {
                     </div>
                     <div>
                       <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Password<span className="text-error-500">*</span>
+                        Password
+                        <span className="text-error-500">*</span>
                       </label>
                       <div className="relative">
                         <input
@@ -249,7 +253,7 @@ const Signup = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Signup;
+export default Signup

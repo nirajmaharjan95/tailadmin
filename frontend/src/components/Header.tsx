@@ -117,7 +117,7 @@ const Header = () => {
 
               <div
                 className="shadow-theme-lg dark:bg-gray-dark absolute -right-[240px] mt-[17px] flex h-[480px] w-[350px] flex-col rounded-2xl border border-gray-200 bg-white p-3 sm:w-[361px] lg:right-0 dark:border-gray-800"
-                style={{ display: "none" }}
+                style={{ display: 'none' }}
                 id="notification-dropdown"
               >
                 <div className="mb-3 flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
@@ -441,8 +441,8 @@ const Header = () => {
               </span>
 
               <span className="text-theme-sm mr-1 block font-medium">
-                {" "}
-                Musharof{" "}
+                {' '}
+                Musharof{' '}
               </span>
 
               <svg
@@ -465,7 +465,7 @@ const Header = () => {
 
             <div
               className="shadow-theme-lg dark:bg-gray-dark absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 dark:border-gray-800"
-              style={{ display: "none" }}
+              style={{ display: 'none' }}
             >
               <div>
                 <span className="text-theme-sm block font-medium text-gray-700 dark:text-gray-400">
@@ -570,7 +570,7 @@ const Header = () => {
         </div>
       </div>
     </header>
-  );
-};
+  )
+}
 
-export default Header;
+export default Header

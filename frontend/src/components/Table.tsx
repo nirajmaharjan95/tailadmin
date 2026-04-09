@@ -2,21 +2,21 @@ import {
   flexRender,
   getCoreRowModel,
   useReactTable,
-} from "@tanstack/react-table";
+} from '@tanstack/react-table'
 
 interface ITable {
-  data: any[];
-  columns: any[];
+  data: any[]
+  columns: any[]
 }
 
 const Table = (props: ITable) => {
-  const { data, columns } = props;
+  const { data, columns } = props
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-  });
+  })
 
   return (
     <table className="w-full table-auto">
@@ -60,7 +60,7 @@ const Table = (props: ITable) => {
         ))}
       </tbody>
     </table>
-  );
-};
+  )
+}
 
-export default Table;
+export default Table

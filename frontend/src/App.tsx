@@ -1,5 +1,5 @@
-import Layout from "./Layout";
-import Dashboard from "./pages/Dashboard";
+import Layout from './Layout'
+import Dashboard from './pages/Dashboard'
 
 function App() {
   return (
@@ -8,7 +8,7 @@ function App() {
         <Dashboard />
       </Layout>
     </>
-  );
+  )
 }
 
-export default App;
+export default App
