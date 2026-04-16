@@ -1,11 +1,12 @@
-import Header from './components/Header'
-import Sidebar from './components/Sidebar'
+import Header from "./components/header/Header";
+import Sidebar from "./components/Sidebar";
+import { SidebarProvider } from "./context/sidebar/SidebarProvider";
 
 interface Iprops {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
-const Layout = ({ children }: Iprops) => {
+const LayoutContent = ({ children }: Iprops) => {
   return (
     <div>
       <div className="flex h-screen overflow-hidden">
@@ -21,7 +22,15 @@ const Layout = ({ children }: Iprops) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Layout
+const Layout = ({ children }: Iprops) => {
+  return (
+    <SidebarProvider>
+      <LayoutContent>{children}</LayoutContent>
+    </SidebarProvider>
+  );
+};
+
+export default Layout;
