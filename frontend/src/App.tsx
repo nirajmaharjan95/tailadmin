@@ -1,14 +1,30 @@
-import Layout from './Layout'
-import Dashboard from './pages/Dashboard'
+import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
+import Layout from "./Layout";
+import Employees from "./pages/Employees";
+import Product from "./pages/Product";
+import Signin from "./pages/Signin";
+import Signup from "./pages/Signup";
+
+const LayoutWrapper = () => (
+  <Layout>
+    <Outlet />
+  </Layout>
+);
 
 function App() {
   return (
-    <>
-      <Layout>
-        <Dashboard />
-      </Layout>
-    </>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Signup />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/signin" element={<Signin />} />
+        <Route element={<LayoutWrapper />}>
+          <Route path="/employees" element={<Employees />} />
+          <Route path="/products" element={<Product />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;

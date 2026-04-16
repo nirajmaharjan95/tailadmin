@@ -1,12 +1,12 @@
-import { LuX } from 'react-icons/lu'
+import { LuX } from "react-icons/lu";
 
 interface IModal {
-  onClose: () => void
-  children: React.ReactNode
+  onClose: () => void;
+  children: React.ReactNode;
 }
 
 const Modal = (props: IModal) => {
-  const { onClose, children } = props
+  const { onClose, children } = props;
   return (
     <div className="fixed inset-0 flex items-center justify-center p-5 overflow-y-auto modal z-99999">
       <div className="modal-close-btn fixed inset-0 h-full w-full bg-gray-400/50 backdrop-blur-[4px]"></div>
@@ -21,7 +21,7 @@ const Modal = (props: IModal) => {
         {children}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Modal
+export default Modal;
