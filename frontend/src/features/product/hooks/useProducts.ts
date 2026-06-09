@@ -1,6 +1,6 @@
 import useDebounce from "@/hooks/useDebounce";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
-import { ModalType } from "@/types/Types";
+import { ModalType } from "@/types/types";
 import { onError, onSuccess } from "@/utils/toast";
 import {
   keepPreviousData,

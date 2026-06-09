@@ -1,5 +1,5 @@
 import useDebounce from "@/hooks/useDebounce";
-import { ModalType } from "@/types/Types";
+import { ModalType } from "@/types/types";
 import { onError, onSuccess } from "@/utils/toast";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";

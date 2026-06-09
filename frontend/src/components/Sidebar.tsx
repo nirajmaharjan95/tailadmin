@@ -1,3 +1,4 @@
+import { CheckLine } from "lucide-react";
 import { LuShoppingCart, LuSquareUserRound } from "react-icons/lu";
 import { Link, NavLink } from "react-router-dom";
 import { useSidebar } from "../hooks/useSidebar";
@@ -12,6 +13,11 @@ const navItems = [
     label: "Products",
     path: "/products",
     icon: <LuShoppingCart size={24} />,
+  },
+  {
+    label: "Tasks",
+    path: "/tasks",
+    icon: <CheckLine size={24} />,
   },
 ];
 

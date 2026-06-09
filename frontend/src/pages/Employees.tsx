@@ -1,3 +1,4 @@
+import CustomBreadcrumb from "@/components/CustomBreadcrumb";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
 import Modal from "@/components/Modal";
 import Table from "@/components/Table";
@@ -34,11 +35,16 @@ const Employees = () => {
   return (
     <>
       <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
-        <div className="px-5 py-4 sm:px-6 sm:py-5">
-          <h3 className="text-base font-medium text-gray-800 dark:text-white/90">
-            Employee List
-          </h3>
+        <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-white/90">
+              Employees
+            </h2>
+
+            <CustomBreadcrumb />
+          </div>
         </div>
+
         <div className="border-t border-gray-100 p-5 dark:border-gray-800 sm:p-6">
           <div className="rounded-xl border border-gray-200 bg-white pt-4 dark:border-gray-800 dark:bg-white/[0.03]">
             <div className="mb-4 flex flex-col gap-2 px-4 sm:flex-row sm:items-center sm:justify-end">
