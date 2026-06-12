@@ -209,7 +209,7 @@ layer(base);
   body {
     @apply bg-white dark:bg-[var(--color-dark-bg-primary)] text-foreground;
   }
-  
+
   html {
     @apply font-sans;
   }
@@ -314,7 +314,6 @@ layer(base);
     -webkit-appearance: none;
   }
 }
-
 
 .tableCheckbox:checked ~ span span {
   @apply opacity-100;

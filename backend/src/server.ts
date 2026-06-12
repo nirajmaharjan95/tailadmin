@@ -3,6 +3,7 @@ import "dotenv/config";
 import express from "express";
 import router from "./routes/employeeRoutes.js";
 import productRouter from "./routes/productRoutes.js";
+import taskRouter from "./routes/taskRoutes.js";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -17,5 +18,6 @@ app.use((_req, res, next) => {
 
 app.use("/api/employees", router);
 app.use("/api/products", productRouter);
+app.use("/api/tasks", taskRouter);
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
