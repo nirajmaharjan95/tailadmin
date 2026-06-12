@@ -8,6 +8,7 @@ import Product from "./pages/Product";
 import Signin from "./pages/Signin";
 import Signup from "./pages/Signup";
 import TaskList from "./pages/TaskList";
+import TaskListProvider from "./features/task-list/context/TaskListProvider";
 
 const LayoutWrapper = () => (
   <ProtectedRoute>
@@ -48,7 +49,11 @@ function App() {
         <Route element={<LayoutWrapper />}>
           <Route path="/employees" element={<Employees />} />
           <Route path="/products" element={<Product />} />
-          <Route path="/tasks" element={<TaskList />} />
+          <Route path="/tasks" element={
+            <TaskListProvider>
+              <TaskList />
+            </TaskListProvider>
+          } />
         </Route>
       </Routes>
       <Toaster />

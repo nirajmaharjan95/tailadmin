@@ -9,6 +9,7 @@
     "start": "node dist/server.js",
     "seed": "tsx seeds/employee.ts",
     "seed:product": "tsx seeds/product.ts",
+    "seed:task": "tsx seeds/task.ts",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write .",

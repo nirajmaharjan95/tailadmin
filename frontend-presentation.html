@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TailAdmin Frontend – Architecture Presentation</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface2: #273348;
+      --border: #334155;
+      --accent: #6366f1;
+      --accent2: #22d3ee;
+      --accent3: #f472b6;
+      --green: #4ade80;
+      --yellow: #facc15;
+      --red: #f87171;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --radius: 12px;
+    }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* ── Slide Container ── */
+    #deck {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px 80px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    .slide.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ── Typography ── */
+    .slide-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    h1 { font-size: 3.2rem; font-weight: 800; line-height: 1.15; text-align: center; }
+    h2 { font-size: 2.2rem; font-weight: 700; margin-bottom: 32px; text-align: center; }
+    h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 10px; }
+    p, li { font-size: 1rem; line-height: 1.65; color: var(--text); }
+    .muted { color: var(--muted); }
+    .accent { color: var(--accent); }
+    .accent2 { color: var(--accent2); }
+    .accent3 { color: var(--accent3); }
+    .green { color: var(--green); }
+    .yellow { color: var(--yellow); }
+    .red { color: var(--red); }
+
+    /* ── Gradient Title ── */
+    .gradient-text {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── Cards & Grids ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+    }
+    .card-accent {
+      border-left: 4px solid var(--accent);
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; width: 100%; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; width: 100%; }
+
+    /* ── Pill / Badge ── */
+    .pill {
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .pill-indigo { background: rgba(99,102,241,0.2); color: var(--accent); }
+    .pill-cyan   { background: rgba(34,211,238,0.18); color: var(--accent2); }
+    .pill-pink   { background: rgba(244,114,182,0.2); color: var(--accent3); }
+    .pill-green  { background: rgba(74,222,128,0.18); color: var(--green); }
+    .pill-yellow { background: rgba(250,204,21,0.18); color: var(--yellow); }
+    .pill-red    { background: rgba(248,113,113,0.18); color: var(--red); }
+
+    /* ── Tag row ── */
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
+    /* ── List ── */
+    ul.check { list-style: none; }
+    ul.check li { padding-left: 1.6em; position: relative; margin-bottom: 8px; }
+    ul.check li::before { content: '✓'; position: absolute; left: 0; color: var(--green); font-weight: 700; }
+    ul.bullet { list-style: none; }
+    ul.bullet li { padding-left: 1.4em; position: relative; margin-bottom: 8px; }
+    ul.bullet li::before { content: '→'; position: absolute; left: 0; color: var(--accent); }
+
+    /* ── Code snippet ── */
+    code {
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.88rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 2px 7px;
+    }
+    pre {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.82rem;
+      line-height: 1.7;
+      overflow: auto;
+      width: 100%;
+    }
+    pre .kw  { color: #c084fc; }
+    pre .str { color: var(--green); }
+    pre .cmt { color: var(--muted); }
+    pre .fn  { color: var(--accent2); }
+    pre .type{ color: var(--yellow); }
+
+    /* ── Tree ── */
+    .tree { font-family: 'Cascadia Code', monospace; font-size: 0.85rem; line-height: 1.9; }
+    .tree .dir  { color: var(--accent2); font-weight: 700; }
+    .tree .file { color: var(--muted); }
+    .tree .hi   { color: var(--accent3); font-weight: 700; }
+
+    /* ── Route Box ── */
+    .route-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 16px;
+      background: var(--surface2);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      border-left: 3px solid var(--accent);
+    }
+    .route-row .method { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; }
+    .route-row .path { font-family: monospace; font-size: 0.9rem; color: var(--accent2); flex: 1; }
+    .route-row .desc { font-size: 0.85rem; color: var(--muted); }
+
+    /* ── Flow Arrow ── */
+    .flow { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; width: 100%; }
+    .flow-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 20px;
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .flow-arrow { color: var(--muted); font-size: 1.4rem; }
+
+    /* ── Progress / Comparison ── */
+    .compare-row { display: flex; gap: 20px; width: 100%; }
+    .compare-box {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+    }
+
+    /* ── Icon cell ── */
+    .icon-cell { font-size: 2rem; margin-bottom: 8px; }
+
+    /* ── Navigation ── */
+    #nav {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(30,41,59,0.9);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 10px 20px;
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+    #nav button {
+      background: none;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 4px 10px;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    #nav button:hover { background: var(--surface2); }
+    #nav button:disabled { opacity: 0.3; cursor: default; }
+    #slide-counter { font-size: 0.8rem; color: var(--muted); min-width: 60px; text-align: center; }
+
+    /* ── Progress bar ── */
+    #progress {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: width 0.3s ease;
+      z-index: 101;
+    }
+
+    /* ── Slide-specific backgrounds ── */
+    .slide-hero { background: radial-gradient(ellipse at 60% 40%, rgba(99,102,241,0.15) 0%, transparent 70%), var(--bg); }
+    .slide-dark  { background: var(--bg); }
+  </style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<div id="deck">
+
+  <!-- ══════════════════════════════════════════
+       SLIDE 1 — Title
+  ═══════════════════════════════════════════ -->
+  <section class="slide slide-hero active" id="s1">
+    <div class="slide-label">Frontend Architecture</div>
+    <h1><span class="gradient-text">TailAdmin</span></h1>
+    <p style="margin-top:16px; font-size:1.15rem; color:var(--muted); text-align:center; max-width:560px;">
+      A React + TypeScript admin dashboard — architecture deep-dive
+    </p>
+    <div class="tags" style="margin-top:32px; justify-content:center;">
+      <span class="pill pill-indigo">React 19</span>
+      <span class="pill pill-cyan">TypeScript 5.8</span>
+      <span class="pill pill-pink">Vite 6</span>
+      <span class="pill pill-green">Tailwind CSS 4</span>
+      <span class="pill pill-yellow">Clerk Auth</span>
+      <span class="pill pill-red">TanStack Query</span>
+    </div>
+    <p style="margin-top:48px; font-size:0.8rem; color:var(--muted);">Use ← → arrow keys or buttons to navigate</p>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       SLIDE 2 — Tech Stack
+  ═══════════════════════════════════════════ -->
+  <section class="slide slide-dark" id="s2">
+    <div class="slide-label">Slide 2</div>
+    <h2>Tech Stack</h2>
+    <div class="grid-3" style="max-width:900px;">
+
+      <div class="card card-accent">
+        <div class="icon-cell">⚛️</div>
+        <h3>Core</h3>
+        <ul class="bullet">
+          <li>React <code>19</code></li>
+          <li>TypeScript <code>5.8</code></li>
+          <li>Vite <code>6</code></li>
+          <li>React Router DOM <code>v7</code></li>
+        </ul>
+      </div>
+
+      <div class="card card-accent" style="border-left-color:var(--accent2)">
+        <div class="icon-cell">🎨</div>
+        <h3>UI & Styling</h3>
+        <ul class="bullet">
+          <li>Tailwind CSS <code>v4</code></li>
+          <li>shadcn/ui + Radix UI</li>
+          <li>lucide-react · react-icons</li>
+          <li>sonner (toasts)</li>
+        </ul>
+      </div>
+
+      <div class="card card-accent" style="border-left-color:var(--accent3)">
+        <div class="icon-cell">🔑</div>
+        <h3>Auth</h3>
+        <ul class="bullet">
+          <li>Clerk (session + OAuth)</li>
+          <li>Role via <code>publicMetadata</code></li>
+          <li>No custom JWT</li>
+        </ul>
+      </div>
+
+      <div class="card card-accent" style="border-left-color:var(--green)">
+        <div class="icon-cell">📡</div>
+        <h3>Data Fetching</h3>
+        <ul class="bullet">
+          <li>TanStack Query <code>v5</code></li>
+          <li>TanStack Table <code>v8</code></li>
+          <li>Native <code>fetch</code> wrapper</li>
+        </ul>
+      </div>
+
+      <div class="card card-accent" style="border-left-color:var(--yellow)">
+        <div class="icon-cell">📋</div>
+        <h3>Forms</h3>
+        <ul class="bullet">
+          <li>react-hook-form <code>v7</code></li>
+          <li>Zod <code>v4</code> validation</li>
+          <li>@hookform/resolvers</li>
+        </ul>
+      </div>
+
+      <div class="card card-accent" style="border-left-color:var(--red)">
+        <div class="icon-cell">🛠️</div>
+        <h3>Tooling</h3>
+        <ul class="bullet">
+          <li>ESLint 9 + TS-ESLint</li>
+          <li>Prettier 3</li>
+          <li>Husky + lint-staged</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       SLIDE 3 — Project Structure
+  ═══════════════════════════════════════════ -->
+  <section class="slide slide-dark" id="s3">
+    <div class="slide-label">Slide 3</div>
+    <h2>Project Structure</h2>
+    <div class="grid-2" style="max-width:860px; align-items:start;">
+
+      <div class="card" style="height:100%;">
+        <h3 style="color:var(--accent2); margin-bottom:14px;">src/</h3>
+        <div class="tree">
+          <div><span class="dir">api/</span>         <span class="muted">— fetch client</span></div>
+          <div><span class="dir">assets/</span>      <span class="muted">— static files</span></div>
+          <div><span class="dir">components/</span>  <span class="muted">— shared UI</span></div>
+          <div>&nbsp;&nbsp;<span class="file">header/</span></div>
+          <div>&nbsp;&nbsp;<span class="file">routes/</span></div>
+          <div>&nbsp;&nbsp;<span class="file">ui/ (shadcn)</span></div>
+          <div><span class="dir">context/</span>     <span class="muted">— providers</span></div>
+          <div>&nbsp;&nbsp;<span class="file">theme/</span></div>
+          <div>&nbsp;&nbsp;<span class="file">sidebar/</span></div>
+          <div><span class="dir">features/</span>    <span class="hi">← vertical slices</span></div>
+          <div><span class="dir">hooks/</span>       <span class="muted">— shared hooks</span></div>
+          <div><span class="dir">pages/</span>       <span class="muted">— route pages</span></div>
+          <div><span class="dir">types/</span></div>
+          <div><span class="dir">utils/</span></div>
+          <div><span class="file">App.tsx · Layout.tsx · main.tsx</span></div>
+        </div>
+      </div>
+
+      <div class="card" style="height:100%;">
+        <h3 style="color:var(--accent3); margin-bottom:14px;">features/ (vertical slice)</h3>
+        <div class="tree">
+          <div><span class="dir">authentication/</span></div>
+          <div>&nbsp;&nbsp;<span class="file">components/  hooks/  schema/</span></div>
+          <br/>
+          <div><span class="dir">employee/</span></div>
+          <div>&nbsp;&nbsp;<span class="file">api/  components/  hooks/</span></div>
+          <div>&nbsp;&nbsp;<span class="file">schemas/  types/</span></div>
+          <br/>
+          <div><span class="dir">product/</span></div>
+          <div>&nbsp;&nbsp;<span class="file">api/  components/  hooks/</span></div>
+          <div>&nbsp;&nbsp;<span class="file">schemas/  types/</span></div>
+          <br/>
+          <div><span class="dir">task-list/</span></div>
+          <div>&nbsp;&nbsp;<span class="file">api/  components/  hooks/</span></div>
+          <div>&nbsp;&nbsp;<span class="file">types/  utils/</span></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       SLIDE 4 — Routing
+  ═══════════════════════════════════════════ -->
+  <section class="slide slide-dark" id="s4">
+    <div class="slide-label">Slide 4</div>
+    <h2>Routing</h2>
+    <div style="max-width:760px; width:100%;">
+
+      <p style="text-align:center; color:var(--muted); margin-bottom:24px;">
+        React Router DOM v7 · Public routes redirect authenticated users · Protected routes redirect guests
+      </p>
+
+      <div class="route-row">
+        <span class="pill pill-cyan method">PUBLIC</span>
+        <span class="path">/  &nbsp;/signup</span>
+        <span class="desc">Signup page — redirects to /employees if already signed in</span>
+      </div>
+      <div class="route-row">
+        <span class="pill pill-cyan method">PUBLIC</span>
+        <span class="path">/signin</span>
+        <span class="desc">Signin page — redirects to /employees if already signed in</span>
+      </div>
+      <div class="route-row" style="border-left-color:var(--accent3)">
+        <span class="pill pill-pink method">PROTECTED</span>
+        <span class="path">/employees</span>
+        <span class="desc">Employee management table</span>
+      </div>
+      <div class="route-row" style="border-left-color:var(--accent3)">
+        <span class="pill pill-pink method">PROTECTED</span>
+        <span class="path">/products</span>
+        <span class="desc">Product catalog table</span>
+      </div>
+      <div class="route-row" style="border-left-color:var(--accent3)">
+        <span class="pill pill-pink method">PROTECTED</span>
+        <span class="path">/tasks</span>
+        <span class="desc">Task board (Kanban-style)</span>
+      </div>
+
+      <div style="margin-top:24px; display:flex; gap:12px; justify-content:center;">
+        <div class="card" style="flex:1; text-align:center;">
+          <h3 style="color:var(--accent2)">ProtectedRoute</h3>
+          <p class="muted" style="font-size:0.88rem;">Uses Clerk <code>useUser()</code> — redirects to <code>/signin</code> if not signed in</p>
+        </div>
+        <div class="card" style="flex:1; text-align:center;">
+          <h3 style="color:var(--green)">PublicRoute</h3>
+          <p class="muted" style="font-size:0.88rem;">Redirects authenticated users away from auth pages to <code>/employees</code></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       SLIDE 5 — Layout & Shell
+  ═══════════════════════════════════════════ -->
+  <section class="slide slide-dark" id="s5">
+    <div class="slide-label">Slide 5</div>
+    <h2>Layout & Shell</h2>
+    <div style="max-width:860px; width:100%;">
+
+      <div class="flow" style="margin-bottom:28px;">
+        <div class="flow-box" style="border-color:var(--accent);">
+          <div style="font-size:1.4rem;">🧩</div>
+          <div>ClerkProvider</div>
+        </div>
+        <div class="flow-arrow">›</div>
+        <div class="flow-box" style="border-color:var(--accent2);">
+          <div style="font-size:1.4rem;">🌗</div>
+          <div>ThemeProvider</div>
+        </div>
+        <div class="flow-arrow">›</div>
+        <div class="flow-box" style="border-color:var(--green);">
+          <div style="font-size:1.4rem;">⚡</div>
+          <div>QueryClientProvider</div>
+        </div>
+        <div class="flow-arrow">›</div>
+        <div class="flow-box" style="border-color:var(--accent3);">
+          <div style="font-size:1.4rem;">📌</div>
+          <div>SidebarProvider</div>
+        </div>
+        <div class="flow-arrow">›</div>
+        <div class="flow-box" style="border-color:var(--yellow);">
+          <div style="font-size:1.4rem;">📄</div>
+          <div>Page Content</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>📐 Layout.tsx</h3>
+          <ul class="bullet">
+            <li>Mounts <code>SidebarProvider</code></li>
+            <li>Renders <code>&lt;Sidebar&gt;</code> (collapsible, left rail)</li>
+            <li>Renders <code>&lt;Header&gt;</code> (top bar)</li>
+            <li>Wraps page in a scrollable <code>&lt;main&gt;</code></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🧭 Header</h3>
+          <ul class="bullet">
+            <li>Sidebar toggle button</li>
+            <li>Global search input</li>
+            <li>Theme toggle (light / dark)</li>
+            <li>Notification dropdown</li>
+            <li>User profile menu (Clerk)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       SLIDE 6 — Pages
+  ═══════════════════════════════════════════ -->
+  <section class="slide slide-dark" id="s6">
+    <div class="slide-label">Slide 6</div>
+    <h2>Pages</h2>
+    <div class="grid-2" style="max-width:860px;">
+
+      <div class="card card-accent">
+        <h3>👤 Signup &amp; Signin</h3>
+        <ul class="bullet">
+          <li>Clerk-powered authentication</li>
+          <li>Email/password + OAuth buttons</li>
+          <li>react-hook-form + Zod validation</li>
+          <li>Redirect to <code>/employees</code> on success</li>
+        </ul>
+      </div>
+
+      <div class="card card-accent" style="border-left-color:var(--accent2)">
+        <h3>👥 Employees</h3>
+        <ul class="bullet">
+          <li>Paginated table with search</li>
+          <li>Add / Edit modal (admin only)</li>
+          <li>Delete confirmation modal</li>
+          <li>State: <code>useState</code> + <code>useEffect</code></li>
+        </ul>
+      </div>
+
+      <div class="card card-accent" style="border-left-color:var(--accent3)">
+        <h3>📦 Products</h3>
+        <ul class="bullet">
+          <li>Paginated table with search</li>
+          <li>Add / Edit / Delete (admin only)</li>
+          <li>State: <span class="accent">TanStack React Query</span></li>
+          <li>URL-driven pagination via <code>useSearchParams</code></li>
+        </ul>
+      </div>
+
+      <div class="card card-accent" style="border-left-color:var(--green)">
+        <h3>✅ Tasks</h3>
+        <ul class="bullet">
+          <li>Kanban-style task board</li>
+          <li>Filter tabs: All · To Do · In Progress · Completed</li>
+          <li>Task cards with status badges</li>
+          <li>State: <code>useState</code> + <code>useEffect</code></li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       SLIDE 7 — Shared Components
+  ═══════════════════════════════════════════ -->
+  <section class="slide slide-dark" id="s7">
+    <div class="slide-label">Slide 7</div>
+    <h2>Shared Components</h2>
+    <div class="grid-3" style="max-width:900px;">
+
+      <div class="card">
+        <h3 style="color:var(--accent2)">📊 Table</h3>
+        <p style="font-size:0.9rem; color:var(--muted);">Generic wrapper around TanStack Table. Accepts columns + data props — reused across all resource pages.</p>
+      </div>
+
+      <div class="card">
+        <h3 style="color:var(--accent2)">📄 Pagination</h3>
+        <p style="font-size:0.9rem; color:var(--muted);">Page navigation + page-size selector. Used in Employees and Products tables.</p>
+      </div>
+
+      <div class="card">
+        <h3 style="color:var(--accent2)">🪟 Modal</h3>
+        <p style="font-size:0.9rem; color:var(--muted);">Generic overlay modal wrapper — backdrop + container. Feature forms are composed inside it.</p>
+      </div>
+
+      <div class="card">
+        <h3 style="color:var(--accent3)">🗑️ DeleteConfirmModal</h3>
+        <p style="font-size:0.9rem; color:var(--muted);">Reusable delete confirmation dialog with cancel / confirm actions.</p>
+      </div>
+
+      <div class="card">
+        <h3 style="color:var(--accent3)">🍞 CustomBreadcrumb</h3>
+        <p style="font-size:0.9rem; color:var(--muted);">Auto-generates breadcrumbs from the current route path segments.</p>
+      </div>
+
+      <div class="card">
+        <h3 style="color:var(--accent3)">🌓 ThemeToggle</h3>
+        <p style="font-size:0.9rem; color:var(--muted);">Light / dark mode button — consumes <code>useTheme()</code> from ThemeContext.</p>
+      </div>
+
+    </div>
+    <p class="muted" style="margin-top:20px; font-size:0.85rem;">All shadcn/ui primitives live in <code>components/ui/</code> — button, input, badge, checkbox, skeleton, toast…</p>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       SLIDE 8 — API Layer
+  ═══════════════════════════════════════════ -->
+  <section class="slide slide-dark" id="s8">
+    <div class="slide-label">Slide 8</div>
+    <h2>API Layer</h2>
+    <div style="max-width:860px; width:100%;">
+
+      <div class="card" style="margin-bottom:20px;">
+        <h3 style="color:var(--accent2); margin-bottom:12px;">api/client.ts — typed fetch wrapper</h3>
+        <pre><span class="kw">const</span> BASE_URL = <span class="str">"http://localhost:4000/api"</span>
+
+<span class="fn">get</span>&lt;<span class="type">T</span>&gt;(endpoint, params?)   <span class="cmt">// serializes query params</span>
+<span class="fn">post</span>&lt;<span class="type">T</span>&gt;(endpoint, body)      <span class="cmt">// JSON body</span>
+<span class="fn">put</span>&lt;<span class="type">T</span>&gt;(endpoint, body)       <span class="cmt">// JSON body</span>
+<span class="fn">del</span>&lt;<span class="type">T</span>&gt;(endpoint)            <span class="cmt">// DELETE</span></pre>
+      </div>
+
+      <div class="grid-3">
+        <div class="card" style="text-align:center;">
+          <h3>👥 Employees</h3>
+          <div class="tags" style="justify-content:center; margin-top:8px;">
+            <span class="pill pill-green">GET</span>
+            <span class="pill pill-indigo">POST</span>
+            <span class="pill pill-yellow">PUT</span>
+            <span class="pill pill-red">DELETE</span>
+          </div>
+          <p class="muted" style="font-size:0.8rem; margin-top:8px;">/employees · /:id</p>
+        </div>
+        <div class="card" style="text-align:center;">
+          <h3>📦 Products</h3>
+          <div class="tags" style="justify-content:center; margin-top:8px;">
+            <span class="pill pill-green">GET</span>
+            <span class="pill pill-indigo">POST</span>
+            <span class="pill pill-yellow">PUT</span>
+            <span class="pill pill-red">DELETE</span>
+          </div>
+          <p class="muted" style="font-size:0.8rem; margin-top:8px;">/products · /:id</p>
+        </div>
+        <div class="card" style="text-align:center;">
+          <h3>✅ Tasks</h3>
+          <div class="tags" style="justify-content:center; margin-top:8px;">
+            <span class="pill pill-green">GET</span>
+            <span class="pill pill-indigo">POST</span>
+            <span class="pill pill-yellow">PUT</span>
+            <span class="pill pill-red">DELETE</span>
+          </div>
+          <p class="muted" style="font-size:0.8rem; margin-top:8px;">/tasks · /:id</p>
+        </div>
+      </div>
+
+      <p class="muted" style="margin-top:16px; font-size:0.85rem; text-align:center;">
+        All GET endpoints support <code>limit</code>, <code>offset</code>, <code>search</code> query params for server-side pagination & filtering
+      </p>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       SLIDE 9 — State Management
+  ═══════════════════════════════════════════ -->
+  <section class="slide slide-dark" id="s9">
+    <div class="slide-label">Slide 9</div>
+    <h2>State Management</h2>
+    <div style="max-width:860px; width:100%;">
+
+      <div class="compare-row" style="margin-bottom:20px;">
+        <div class="compare-box" style="border-left:4px solid var(--accent)">
+          <h3 style="color:var(--accent)">🗄️ Server State — TanStack Query</h3>
+          <ul class="bullet" style="margin-top:10px;">
+            <li>Used in <strong>Products</strong> feature</li>
+            <li><code>useQuery</code> with <code>keepPreviousData</code> for smooth pagination</li>
+            <li><code>useMutation</code> + automatic cache invalidation</li>
+            <li>DevTools included in development</li>
+          </ul>
+        </div>
+        <div class="compare-box" style="border-left:4px solid var(--yellow)">
+          <h3 style="color:var(--yellow)">🔧 Local State — useState/useEffect</h3>
+          <ul class="bullet" style="margin-top:10px;">
+            <li>Used in <strong>Employees</strong> + <strong>Tasks</strong></li>
+            <li>Manual fetch in <code>useEffect</code></li>
+            <li><code>refreshTrigger</code> counter for re-fetching</li>
+            <li>Opportunity: migrate to React Query</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="card" style="text-align:center; border-left:3px solid var(--accent2)">
+          <div style="font-size:1.5rem;">🔗</div>
+          <h3>URL State</h3>
+          <p class="muted" style="font-size:0.85rem;"><code>useSearchParams</code> drives <code>page</code>, <code>pageSize</code>, <code>search</code> — shareable &amp; bookmarkable</p>
+        </div>
+        <div class="card" style="text-align:center; border-left:3px solid var(--accent3)">
+          <div style="font-size:1.5rem;">🌗</div>
+          <h3>Theme &amp; Sidebar</h3>
+          <p class="muted" style="font-size:0.85rem;">React Context — persisted to <code>localStorage</code>; no external lib needed</p>
+        </div>
+        <div class="card" style="text-align:center; border-left:3px solid var(--green)">
+          <div style="font-size:1.5rem;">🔑</div>
+          <h3>Auth State</h3>
+          <p class="muted" style="font-size:0.85rem;">Fully managed by Clerk. <code>useUser()</code> provides session &amp; user object anywhere</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       SLIDE 10 — Custom Hooks
+  ═══════════════════════════════════════════ -->
+  <section class="slide slide-dark" id="s10">
+    <div class="slide-label">Slide 10</div>
+    <h2>Custom Hooks</h2>
+    <div class="grid-2" style="max-width:860px;">
+
+      <div>
+        <h3 style="color:var(--muted); font-size:0.8rem; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:12px;">Shared / Utility</h3>
+        <div class="card" style="margin-bottom:10px;">
+          <code style="color:var(--accent2)">useIsAdmin()</code>
+          <p class="muted" style="font-size:0.88rem; margin-top:6px;">Checks <code>user.publicMetadata.role === "admin"</code> via Clerk — controls write access in UI</p>
+        </div>
+        <div class="card" style="margin-bottom:10px;">
+          <code style="color:var(--accent2)">useDebounce(value, delay)</code>
+          <p class="muted" style="font-size:0.88rem; margin-top:6px;">Generic 1000ms debounce for search inputs across all pages</p>
+        </div>
+        <div class="card" style="margin-bottom:10px;">
+          <code style="color:var(--accent2)">useOutsideClick(ref, cb)</code>
+          <p class="muted" style="font-size:0.88rem; margin-top:6px;">Dismisses dropdowns &amp; menus when clicking outside</p>
+        </div>
+        <div class="card">
+          <code style="color:var(--accent2)">useTheme() · useSidebar()</code>
+          <p class="muted" style="font-size:0.88rem; margin-top:6px;">Context consumers for theme and sidebar state</p>
+        </div>
+      </div>
+
+      <div>
+        <h3 style="color:var(--muted); font-size:0.8rem; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:12px;">Feature Hooks</h3>
+        <div class="card" style="margin-bottom:10px;">
+          <code style="color:var(--accent3)">useEmployees()</code>
+          <p class="muted" style="font-size:0.88rem; margin-top:6px;">All employee page state — data, pagination, search, modal type, CRUD handlers</p>
+        </div>
+        <div class="card" style="margin-bottom:10px;">
+          <code style="color:var(--accent3)">useProducts()</code>
+          <p class="muted" style="font-size:0.88rem; margin-top:6px;">Same scope but backed by React Query — cleaner cache invalidation</p>
+        </div>
+        <div class="card" style="margin-bottom:10px;">
+          <code style="color:var(--accent3)">useTask()</code>
+          <p class="muted" style="font-size:0.88rem; margin-top:6px;">Fetches all tasks on mount; exposes <code>tasks</code>, <code>setTasks</code>, <code>isLoading</code></p>
+        </div>
+        <div class="card">
+          <code style="color:var(--accent3)">useSigninForm() · useSignupForm()</code>
+          <p class="muted" style="font-size:0.88rem; margin-top:6px;">Form state + Clerk submission logic encapsulated per auth flow</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       SLIDE 11 — Authentication Flow
+  ═══════════════════════════════════════════ -->
+  <section class="slide slide-dark" id="s11">
+    <div class="slide-label">Slide 11</div>
+    <h2>Authentication Flow</h2>
+    <div style="max-width:760px; width:100%;">
+
+      <div class="flow" style="margin-bottom:32px; flex-direction:column; gap:8px;">
+        <div class="flow-box" style="border-color:var(--accent); width:100%;">
+          🧩 <strong>ClerkProvider</strong> — wraps entire app at root
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-box" style="border-color:var(--accent2); width:100%;">
+          👤 User visits <code>/signup</code> or <code>/signin</code> → Clerk handles session creation
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-box" style="border-color:var(--green); width:100%;">
+          ✅ <strong>RouteGuard</strong> reads <code>useUser().isSignedIn</code> → gates protected routes
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-box" style="border-color:var(--accent3); width:100%;">
+          🔑 <strong>useIsAdmin()</strong> checks <code>user.publicMetadata.role === "admin"</code> → shows/hides write actions
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>🚫 Non-Admin Users</h3>
+          <ul class="bullet">
+            <li>Can view all pages</li>
+            <li>Add / Edit / Delete buttons hidden</li>
+            <li>Read-only access to all data</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>✅ Admin Users</h3>
+          <ul class="bullet">
+            <li>Full CRUD on Employees &amp; Products</li>
+            <li>Role set in Clerk's <code>publicMetadata</code></li>
+            <li>No backend role config needed client-side</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       SLIDE 12 — Data Flow (Products example)
+  ═══════════════════════════════════════════ -->
+  <section class="slide slide-dark" id="s12">
+    <div class="slide-label">Slide 12</div>
+    <h2>Data Flow — Products (React Query)</h2>
+    <div style="max-width:800px; width:100%;">
+
+      <pre><span class="cmt">// features/product/hooks/useProducts.ts</span>
+
+<span class="kw">const</span> { data, isLoading } = <span class="fn">useQuery</span>({
+  queryKey: [<span class="str">"products"</span>, pageIndex, pageSize, debouncedSearch],
+  queryFn: () =&gt; <span class="fn">getProducts</span>({ limit, offset, search }),
+  placeholderData: <span class="fn">keepPreviousData</span>,   <span class="cmt">// no flash on page change</span>
+});
+
+<span class="kw">const</span> deleteMutation = <span class="fn">useMutation</span>({
+  mutationFn: deleteProduct,
+  onSuccess: () =&gt; {
+    queryClient.<span class="fn">invalidateQueries</span>({ queryKey: [<span class="str">"products"</span>] });
+    <span class="fn">onSuccess</span>(<span class="str">"Product deleted successfully"</span>);
+  },
+});</pre>
+
+      <div class="grid-3" style="margin-top:20px;">
+        <div class="card" style="text-align:center;">
+          <div style="font-size:1.3rem;">🔗</div>
+          <p style="font-size:0.88rem;"><strong>URL drives state</strong><br/><span class="muted">page, pageSize, search via <code>useSearchParams</code></span></p>
+        </div>
+        <div class="card" style="text-align:center;">
+          <div style="font-size:1.3rem;">⚡</div>
+          <p style="font-size:0.88rem;"><strong>Debounced search</strong><br/><span class="muted">1000ms delay before API call fires</span></p>
+        </div>
+        <div class="card" style="text-align:center;">
+          <div style="font-size:1.3rem;">🔄</div>
+          <p style="font-size:0.88rem;"><strong>Auto cache invalidation</strong><br/><span class="muted">Mutate → invalidate → refetch automatically</span></p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       SLIDE 13 — Key Observations & Highlights
+  ═══════════════════════════════════════════ -->
+  <section class="slide slide-dark" id="s13">
+    <div class="slide-label">Slide 13</div>
+    <h2>Key Observations</h2>
+    <div class="grid-2" style="max-width:860px;">
+
+      <div class="card card-accent">
+        <h3>✅ Strengths</h3>
+        <ul class="check" style="margin-top:12px;">
+          <li>Vertical slice architecture — each feature is self-contained</li>
+          <li>Shared generic components (Table, Modal, Pagination)</li>
+          <li>URL-driven table state — bookmarkable &amp; shareable</li>
+          <li>Clerk handles all auth complexity</li>
+          <li>Zod + react-hook-form = type-safe forms</li>
+          <li>Code quality tools: ESLint, Prettier, Husky</li>
+        </ul>
+      </div>
+
+      <div class="card card-accent" style="border-left-color:var(--yellow)">
+        <h3 style="color:var(--yellow)">⚠️ Opportunities</h3>
+        <ul class="bullet" style="margin-top:12px;">
+          <li>Employees + Tasks still use <code>useState/useEffect</code> — migrate to React Query</li>
+          <li>No global loading/error boundary</li>
+          <li>Base URL hardcoded — should use env var</li>
+          <li>Notification list is static (no real-time)</li>
+          <li>No unit or integration tests present</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       SLIDE 14 — Summary
+  ═══════════════════════════════════════════ -->
+  <section class="slide slide-hero" id="s14">
+    <div class="slide-label">Summary</div>
+    <h2 style="font-size:2.4rem; margin-bottom:24px;">TailAdmin Frontend at a Glance</h2>
+
+    <div class="grid-4" style="max-width:900px; margin-bottom:32px;">
+      <div class="card" style="text-align:center;">
+        <div style="font-size:2rem;">3</div>
+        <p class="muted" style="font-size:0.85rem;">Protected Pages</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:2rem;">4</div>
+        <p class="muted" style="font-size:0.85rem;">Feature Slices</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:2rem;">11+</div>
+        <p class="muted" style="font-size:0.85rem;">Custom Hooks</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:2rem;">6+</div>
+        <p class="muted" style="font-size:0.85rem;">Shared Components</p>
+      </div>
+    </div>
+
+    <div class="tags" style="justify-content:center;">
+      <span class="pill pill-indigo">React 19 + TypeScript</span>
+      <span class="pill pill-cyan">Vite 6 + Tailwind 4</span>
+      <span class="pill pill-pink">Clerk Auth</span>
+      <span class="pill pill-green">TanStack Query + Table</span>
+      <span class="pill pill-yellow">react-hook-form + Zod</span>
+      <span class="pill pill-red">Vertical Slice Architecture</span>
+    </div>
+  </section>
+
+</div><!-- #deck -->
+
+<!-- ── Navigation ── -->
+<div id="nav">
+  <button id="btn-prev" title="Previous (←)" disabled>←</button>
+  <span id="slide-counter">1 / 14</span>
+  <button id="btn-next" title="Next (→)">→</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  const progress = document.getElementById('progress');
+  const counter  = document.getElementById('slide-counter');
+  const btnPrev  = document.getElementById('btn-prev');
+  const btnNext  = document.getElementById('btn-next');
+
+  function go(idx) {
+    slides[current].classList.remove('active');
+    current = Math.max(0, Math.min(idx, total - 1));
+    slides[current].classList.add('active');
+    counter.textContent = `${current + 1} / ${total}`;
+    btnPrev.disabled = current === 0;
+    btnNext.disabled = current === total - 1;
+    progress.style.width = `${((current + 1) / total) * 100}%`;
+  }
+
+  btnPrev.addEventListener('click', () => go(current - 1));
+  btnNext.addEventListener('click', () => go(current + 1));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown')  go(current + 1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')    go(current - 1);
+  });
+
+  // Initialize progress
+  progress.style.width = `${(1 / total) * 100}%`;
+</script>
+</body>
+</html>
