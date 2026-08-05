@@ -124,7 +124,7 @@ const AddProductModal = ({ onClose, onSuccess, selectedProduct }: IProps) => {
           </label>
           <select {...register("category")} className={inputClass}>
             <option value="">Select category</option>
-            {categories.map((item) => (
+            {categories.map(item => (
               <option key={item} value={item}>
                 {item}
               </option>
@@ -180,7 +180,7 @@ const AddProductModal = ({ onClose, onSuccess, selectedProduct }: IProps) => {
             Status
           </label>
           <select {...register("status")} className={inputClass}>
-            {statusOptions.map((option) => {
+            {statusOptions.map(option => {
               return (
                 <option key={option.value} value={option.value}>
                   {option.label}

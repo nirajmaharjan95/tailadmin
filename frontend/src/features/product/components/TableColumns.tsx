@@ -31,7 +31,7 @@ const TableColumns = (
   onDelete: (id: number) => void,
   isAdmin?: boolean
 ) => [
-  columnHelper.accessor((row) => ({ image: row.image, name: row.name }), {
+  columnHelper.accessor(row => ({ image: row.image, name: row.name }), {
     id: "product",
     header: "Product",
     cell: ({ getValue }) => {
@@ -57,7 +57,7 @@ const TableColumns = (
   }),
   columnHelper.accessor("price", {
     header: "Price",
-    cell: (info) => `${info.getValue()}`,
+    cell: info => `${info.getValue()}`,
     size: widthConfig.price,
   }),
   columnHelper.accessor("stock", {
@@ -66,7 +66,7 @@ const TableColumns = (
   }),
   columnHelper.accessor("status", {
     header: "Status",
-    cell: (info) => (
+    cell: info => (
       <Badge className={getStatusColor(info.getValue())}>
         {info.getValue().toLowerCase()}
       </Badge>

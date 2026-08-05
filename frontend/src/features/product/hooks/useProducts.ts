@@ -45,7 +45,7 @@ export const useProducts = () => {
       onSuccess("Product deleted successfully");
       handleClose();
     },
-    onError: (err) => {
+    onError: err => {
       onError(err, "Failed to delete product");
     },
   });
@@ -72,7 +72,7 @@ export const useProducts = () => {
   };
 
   const handleConfirmationModal = (id: number) => {
-    const product = products.find((p) => p.id === id);
+    const product = products.find(p => p.id === id);
     if (product) {
       setSelectedProduct(product);
       setModalType("delete");
@@ -85,7 +85,7 @@ export const useProducts = () => {
   };
 
   const handlePageChange = (newPageIndex: number) => {
-    setSearchParams((prev) => {
+    setSearchParams(prev => {
       const newPage = newPageIndex + 1;
       if (newPage <= 1) {
         prev.delete("page");
@@ -97,7 +97,7 @@ export const useProducts = () => {
   };
 
   const handlePageSizeChange = (newPageSize: number) => {
-    setSearchParams((prev) => {
+    setSearchParams(prev => {
       prev.set("pageSize", String(newPageSize));
       prev.delete("page");
       return prev;
@@ -105,7 +105,7 @@ export const useProducts = () => {
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchParams((prev) => {
+    setSearchParams(prev => {
       prev.set("search", e.target.value);
       return prev;
     });

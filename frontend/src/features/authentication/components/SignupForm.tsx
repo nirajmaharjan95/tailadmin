@@ -81,12 +81,15 @@ const SignupForm = () => {
               {...register("password")}
             />
             <span className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2">
-              <button
+              <Button
+                type="button"
                 onClick={togglePassword}
+                variant="ghost"
+                size="icon-sm"
                 className="fill-gray-500 dark:fill-gray-400"
               >
                 {showPassword ? <LuEye size={16} /> : <LuEyeOff size={16} />}
-              </button>
+              </Button>
             </span>
 
             {errors.password && (
@@ -101,7 +104,7 @@ const SignupForm = () => {
               id="terms"
               {...register("terms")}
               checked={termsChecked}
-              onCheckedChange={(checked) => {
+              onCheckedChange={checked => {
                 register("terms").onChange({
                   target: { value: checked === true, name: "terms" },
                 });
@@ -133,7 +136,6 @@ const SignupForm = () => {
             {isLoading ? "Creating account..." : "Sign Up"}
           </Button>
         </div>
-        <div id="clerk-captcha"></div>
       </div>
     </form>
   );

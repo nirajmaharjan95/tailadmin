@@ -1,12 +1,7 @@
 import { Request, Response } from "express";
-import { productSchema } from "../models/product.model.js";
 import * as productService from "../services/product.service.js";
-
-const parseErrors = (issues: Array<{ path: PropertyKey[]; message: string }>) =>
-  issues.reduce<Record<string, string>>((acc, issue) => {
-    acc[issue.path.join(".")] = issue.message;
-    return acc;
-  }, {});
+import { parseErrors } from "../utils/parse-errors.js";
+import { productSchema } from "../validations/product.validation.js";
 
 export const getAll = async (req: Request, res: Response) => {
   try {

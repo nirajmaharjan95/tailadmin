@@ -1,61 +1,33 @@
-import pool from '../config/db.js';
-import { Task, TaskInput, STATUS } from '../models/task.model.js';
+import * as taskRepository from '../repositories/task.repository.js';
+import { Task, STATUS } from '../types/task.types.js';
+import { TaskInput } from '../validations/task.validation.js';
 
 export const getAllTasks = async (limit: number, offset: number, status?: string): Promise<{ data: Task[]; total: number; allCount: number; countsByStatus: Record<string, number> }> => {
-  const queries = [
-    status
-      ? pool.query(`SELECT * FROM task WHERE status = $3 ORDER BY id DESC LIMIT $1 OFFSET $2`, [limit, offset, status])
-      : pool.query(`SELECT * FROM task ORDER BY id DESC LIMIT $1 OFFSET $2`, [limit, offset]),
-    status
-      ? pool.query(`SELECT COUNT(*)::int AS count FROM task WHERE status = $1`, [status])
-      : pool.query(`SELECT COUNT(*)::int AS count FROM task`),
-    pool.query(`SELECT COUNT(*)::int AS count FROM task`),
-    pool.query(`SELECT COUNT(*)::int AS count FROM task WHERE status = $1`, [STATUS.TODO]),
-    pool.query(`SELECT COUNT(*)::int AS count FROM task WHERE status = $1`, [STATUS.IN_PROGRESS]),
-    pool.query(`SELECT COUNT(*)::int AS count FROM task WHERE status = $1`, [STATUS.COMPLETED]),
-  ];
-
-  const [dataResult, countResult, allCountResult, todoCount, inProgressCount, completedCount] = await Promise.all(queries);
+  const [dataResult, countResult, allCountResult, todoCount, inProgressCount, completedCount] = await Promise.all([
+    taskRepository.findAll(limit, offset, status),
+    taskRepository.countByStatusFilter(status),
+    taskRepository.countAll(),
+    taskRepository.countByStatus(STATUS.TODO),
+    taskRepository.countByStatus(STATUS.IN_PROGRESS),
+    taskRepository.countByStatus(STATUS.COMPLETED),
+  ]);
 
   return {
     data: dataResult.rows,
-    total: Number(countResult.rows[0].count),
-    allCount: Number(allCountResult.rows[0].count),
+    total: Number(countResult.rows[0]?.count ?? 0),
+    allCount: allCountResult,
     countsByStatus: {
-      todo: Number(todoCount.rows[0].count),
-      in_progress: Number(inProgressCount.rows[0].count),
-      completed: Number(completedCount.rows[0].count),
+      todo: Number(todoCount.rows[0]?.count ?? 0),
+      in_progress: Number(inProgressCount.rows[0]?.count ?? 0),
+      completed: Number(completedCount.rows[0]?.count ?? 0),
     },
   };
 };
 
-export const getTaskById = async (id: number): Promise<Task | null> => {
-  const result = await pool.query('SELECT * FROM task WHERE id = $1', [id]);
-  return result.rows[0] ?? null;
-};
+export const getTaskById = (id: number): Promise<Task | null> => taskRepository.findById(id);
 
-export const createTask = async (data: TaskInput): Promise<Task> => {
-  const { task_title, due_date, status, tags, description } = data;
-  const result = await pool.query(
-    `INSERT INTO task (task_title, due_date, status, tags, description)
-     VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-    [task_title, due_date, status, tags, description ?? null]
-  );
-  return result.rows[0];
-};
+export const createTask = (data: TaskInput): Promise<Task> => taskRepository.insert(data);
 
-export const updateTask = async (id: number, data: TaskInput): Promise<Task | null> => {
-  const { task_title, due_date, status, tags, description } = data;
-  const result = await pool.query(
-    `UPDATE task
-     SET task_title=$1, due_date=$2, status=$3, tags=$4, description=$5, updated_at=NOW()
-     WHERE id=$6 RETURNING *`,
-    [task_title, due_date, status, tags, description ?? null, id]
-  );
-  return result.rows[0] ?? null;
-};
+export const updateTask = (id: number, data: TaskInput): Promise<Task | null> => taskRepository.update(id, data);
 
-export const deleteTask = async (id: number): Promise<boolean> => {
-  const result = await pool.query('DELETE FROM task WHERE id=$1 RETURNING *', [id]);
-  return result.rows.length > 0;
-};
+export const deleteTask = (id: number): Promise<boolean> => taskRepository.remove(id);

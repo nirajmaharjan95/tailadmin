@@ -27,7 +27,7 @@ const TableColumns = (
       const b = `${rowB.original.first_name} ${rowB.original.last_name}`;
       return a.localeCompare(b);
     },
-    cell: (info) => (
+    cell: info => (
       <>
         <p className="block text-theme-sm font-medium text-gray-800 dark:text-white/90">
           {`${info.row.original.first_name}  ${info.row.original.last_name}`}
@@ -50,14 +50,14 @@ const TableColumns = (
   }),
   columnHelper.accessor("start_date", {
     header: () => <span>Start Date</span>,
-    cell: (info) => formatDate(info.getValue()),
+    cell: info => formatDate(info.getValue()),
   }),
   columnHelper.accessor("salary", {
     header: () => <span>Salary</span>,
   }),
   columnHelper.accessor("phone", {
     header: () => <span>Phone</span>,
-    cell: (info) => <span>{formatPhoneNumber(info.getValue())}</span>,
+    cell: info => <span>{formatPhoneNumber(info.getValue())}</span>,
   }),
 
   // TanStack React Table expects a flat array of column definitions. Without the spread operator, you'd have a nested array [[...]], which breaks the table structure.
@@ -66,7 +66,7 @@ const TableColumns = (
         columnHelper.accessor("actions", {
           header: () => <span>Actions</span>,
           enableSorting: false,
-          cell: (info) => {
+          cell: info => {
             const rowData = info.row.original;
             return (
               <div className="flex items-center gap-2">

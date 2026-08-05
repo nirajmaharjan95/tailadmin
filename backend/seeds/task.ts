@@ -18,39 +18,43 @@ async function seedTasks(count = 50): Promise<void> {
 
   await pool.query(`
     CREATE TABLE task (
-      id          SERIAL PRIMARY KEY,
-      task_title  VARCHAR(200)  NOT NULL,
-      due_date    DATE          NOT NULL,
-      status      VARCHAR(20)   NOT NULL CHECK (status IN ('To Do', 'In Progress', 'Completed')),
-      tags        VARCHAR(50)   NOT NULL,
-      description TEXT,
-      created_at  TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
-      updated_at  TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+      id               SERIAL PRIMARY KEY,
+      task_title       VARCHAR(200)  NOT NULL,
+      due_date         DATE          NOT NULL,
+      status           VARCHAR(20)   NOT NULL CHECK (status IN ('To Do', 'In Progress', 'Completed')),
+      tags             VARCHAR(50)   NOT NULL,
+      description      TEXT,
+      assigned_user_id INT REFERENCES users(id) ON DELETE SET NULL,
+      created_at       TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
+      updated_at       TIMESTAMPTZ   NOT NULL DEFAULT NOW()
     )
   `);
 
-  const values: string[] = [];
+  const userResult = await pool.query(`SELECT id FROM users`);
+  const userIds: number[] = userResult.rows.map((r) => r.id);
+
+  const values: (string | number | null)[] = [];
   const placeholders: string[] = [];
 
   for (let i = 0; i < count; i++) {
-    const base = i * 5;
-    placeholders.push(
-      `($${base + 1}, $${base + 2}, $${base + 3}, $${base + 4}, $${base + 5})`
-    );
+    const base = i * 6;
+    placeholders.push(`($${base + 1}, $${base + 2}, $${base + 3}, $${base + 4}, $${base + 5}, $${base + 6})`);
 
     const taskTag = faker.helpers.arrayElement(tags);
+    const assignedUserId = userIds.length > 0 ? faker.helpers.arrayElement(userIds) : null;
 
     values.push(
       faker.hacker.phrase(),
       faker.date.soon({ days: 30 }).toISOString().split("T")[0],
       faker.helpers.arrayElement(statuses),
       taskTag,
-      faker.lorem.sentence()
+      faker.lorem.sentence(),
+      assignedUserId
     );
   }
 
   const query = `
-    INSERT INTO task (task_title, due_date, status, tags, description)
+    INSERT INTO task (task_title, due_date, status, tags, description, assigned_user_id)
     VALUES ${placeholders.join(",")}
   `;
   await pool.query(query, values);
@@ -59,7 +63,7 @@ async function seedTasks(count = 50): Promise<void> {
 
 (async () => {
   try {
-    await seedTasks(10);
+    await seedTasks(10000);
     await pool.end();
   } catch (err) {
     console.error(err);

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { ThemeContext, ThemeMode } from "./ThemeContext";
 
-
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [theme, setThemeState] = useState<ThemeMode>(() => {
     // Check localStorage first
@@ -31,7 +30,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   }, [theme]);
 
   const toggleTheme = () => {
-    setThemeState((prev) => (prev === "light" ? "dark" : "light"));
+    setThemeState(prev => (prev === "light" ? "dark" : "light"));
   };
 
   const setTheme = (newTheme: ThemeMode) => {

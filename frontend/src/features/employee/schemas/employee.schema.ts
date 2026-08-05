@@ -7,7 +7,7 @@ export const employeeSchema = z.object({
     .string()
     .min(1, "Age is required")
     .refine(
-      (val) =>
+      val =>
         !isNaN(parseInt(val)) && parseInt(val) >= 18 && parseInt(val) <= 100,
       "Age must be between 18 and 100"
     ),
@@ -15,7 +15,7 @@ export const employeeSchema = z.object({
     .string()
     .min(1, "Salary is required")
     .refine(
-      (val) => !isNaN(parseInt(val)) && parseInt(val) > 0,
+      val => !isNaN(parseInt(val)) && parseInt(val) > 0,
       "Salary must be a positive number"
     ),
   start_date: z.string().min(1, "Start date is required"),

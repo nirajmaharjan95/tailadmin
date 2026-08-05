@@ -1,15 +1,19 @@
 import { useOutsideClick } from "@/hooks/useOutsideClick";
-import { Menu, Search } from "lucide-react";
+import { Menu, Search, ShoppingCart } from "lucide-react";
+import { useCart } from "@/features/cart/hooks/useCart";
 import { useRef, useState } from "react";
 import { useSidebar } from "../../hooks/useSidebar";
 import { ThemeToggle } from "../ThemeToggle";
 import NotificationDropdown from "./NotificationDropdown";
 import Profile from "./Profile";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 const Header = () => {
   const { toggle } = useSidebar();
+  const { count } = useCart();
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
+  const isAdmin = useIsAdmin();
 
   useOutsideClick({
     ref: notifRef,
@@ -56,9 +60,24 @@ const Header = () => {
           <div className="2xsm:gap-3 flex items-center gap-2">
             <ThemeToggle />
 
+            {!isAdmin && (
+              <button
+                type="button"
+                aria-label="Cart"
+                className="relative flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+              >
+                <ShoppingCart size={20} />
+                {count > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-500 px-1 text-xs font-semibold text-white">
+                    {count}
+                  </span>
+                )}
+              </button>
+            )}
+
             <div className="relative" ref={notifRef}>
               <button
-                onClick={() => setIsNotificationOpen((prev) => !prev)}
+                onClick={() => setIsNotificationOpen(prev => !prev)}
                 className="hover:text-dark-900 relative flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
               >
                 <span className="absolute top-0.5 right-0 z-1 h-2 w-2 rounded-full bg-orange-400 flex">

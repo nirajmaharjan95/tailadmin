@@ -29,10 +29,7 @@ const positions = [
   "Technical Lead",
 ];
 
-const AddEmployeeModal = ({
-  onClose,
-  selectedEmployee,
-}: Iprops) => {
+const AddEmployeeModal = ({ onClose, selectedEmployee }: Iprops) => {
   const {
     register,
     handleSubmit,
@@ -176,7 +173,7 @@ const AddEmployeeModal = ({
             Position
           </label>
           <select {...register("position")} className={inputClass}>
-            {positions.map((item) => (
+            {positions.map(item => (
               <option key={item} value={item}>
                 {item}
               </option>

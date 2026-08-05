@@ -2,6 +2,7 @@ import CustomBreadcrumb from "@/components/CustomBreadcrumb";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
 import Modal from "@/components/Modal";
 import Table from "@/components/Table";
+import { Button } from "@/components/ui/button";
 import AddProductModal from "@/features/product/components/AddProductModal";
 import TableColumns from "@/features/product/components/TableColumns";
 import { useProducts } from "@/features/product/hooks/useProducts";
@@ -47,9 +48,13 @@ const Product = () => {
             <div className="mb-4 flex flex-col gap-2 px-4 sm:flex-row sm:items-center sm:justify-end">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <div className="relative">
-                  <button className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 pointer-events-none"
+                  >
                     <LuSearch size={16} />
-                  </button>
+                  </Button>
                   <input
                     type="text"
                     placeholder="Search..."
@@ -60,13 +65,10 @@ const Product = () => {
                 </div>
 
                 {isAdmin && (
-                  <button
-                    onClick={handleOpenAdd}
-                    className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-[11px] text-sm font-medium text-gray-700 shadow-theme-xs dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 sm:w-auto"
-                  >
+                  <Button onClick={handleOpenAdd} variant="default" size={"lg"}>
                     <MdAdd size={20} />
                     Add New Product
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>

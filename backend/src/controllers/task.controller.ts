@@ -1,12 +1,7 @@
-import { Request, Response } from 'express';
-import { taskSchema } from '../models/task.model.js';
-import * as taskService from '../services/task.service.js';
-
-const parseErrors = (issues: Array<{ path: PropertyKey[]; message: string }>) =>
-  issues.reduce<Record<string, string>>((acc, issue) => {
-    acc[issue.path.join('.')] = issue.message;
-    return acc;
-  }, {});
+import { Request, Response } from "express";
+import * as taskService from "../services/task.service.js";
+import { parseErrors } from "../utils/parse-errors.js";
+import { taskSchema } from "../validations/task.validation.js";
 
 const DEFAULT_LIMIT = 100;
 const MAX_LIMIT = 500;
@@ -17,9 +12,14 @@ export const getAll = async (req: Request, res: Response) => {
     const offset = Math.max(Number(req.query.offset) || 0, 0);
     const status = req.query.status as string | undefined;
     const result = await taskService.getAllTasks(limit, offset, status);
-    res.json({ data: result.data, total: result.total, allCount: result.allCount, countsByStatus: result.countsByStatus });
+    res.json({
+      data: result.data,
+      total: result.total,
+      allCount: result.allCount,
+      countsByStatus: result.countsByStatus,
+    });
   } catch {
-    res.status(500).json({ error: 'Failed to fetch tasks.' });
+    res.status(500).json({ error: "Failed to fetch tasks." });
   }
 };
 
@@ -27,12 +27,12 @@ export const getById = async (req: Request, res: Response) => {
   try {
     const task = await taskService.getTaskById(Number(req.params.id));
     if (!task) {
-      res.status(404).json({ error: 'Task not found' });
+      res.status(404).json({ error: "Task not found" });
       return;
     }
     res.json(task);
   } catch {
-    res.status(500).json({ error: 'Failed to fetch task.' });
+    res.status(500).json({ error: "Failed to fetch task." });
   }
 };
 
@@ -45,8 +45,8 @@ export const create = async (req: Request, res: Response) => {
   try {
     res.status(201).json(await taskService.createTask(parsed.data));
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error';
-    res.status(400).json({ error: 'Failed to create task.', detail: message });
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.status(400).json({ error: "Failed to create task.", detail: message });
   }
 };
 
@@ -59,12 +59,12 @@ export const update = async (req: Request, res: Response) => {
   try {
     const task = await taskService.updateTask(Number(req.params.id), parsed.data);
     if (!task) {
-      res.status(404).json({ error: 'Task not found' });
+      res.status(404).json({ error: "Task not found" });
       return;
     }
     res.json(task);
   } catch {
-    res.status(400).json({ error: 'Failed to update task.' });
+    res.status(400).json({ error: "Failed to update task." });
   }
 };
 
@@ -72,11 +72,11 @@ export const remove = async (req: Request, res: Response) => {
   try {
     const deleted = await taskService.deleteTask(Number(req.params.id));
     if (!deleted) {
-      res.status(404).json({ error: 'Task not found' });
+      res.status(404).json({ error: "Task not found" });
       return;
     }
-    res.json({ message: 'Task deleted successfully.' });
+    res.json({ message: "Task deleted successfully." });
   } catch {
-    res.status(500).json({ error: 'Failed to delete task.' });
+    res.status(500).json({ error: "Failed to delete task." });
   }
 };

@@ -45,14 +45,14 @@ export const useEmployees = () => {
   }, [pageSize, pageIndex, debouncedSearch, refreshTrigger]);
 
   const handlePageChange = (newPageIndex: number) => {
-    setSearchParams((prev) => {
+    setSearchParams(prev => {
       prev.set("page", (newPageIndex + 1).toString());
       return prev;
     });
   };
 
   const handlePageSizeChange = (newPageSize: number) => {
-    setSearchParams((prev) => {
+    setSearchParams(prev => {
       prev.set("pageSize", newPageSize.toString());
       prev.set("page", "1");
       return prev;
@@ -81,7 +81,7 @@ export const useEmployees = () => {
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchParams((prev) => {
+    setSearchParams(prev => {
       const value = e.target.value;
       prev.set("search", value);
       prev.delete("page");
@@ -110,7 +110,7 @@ export const useEmployees = () => {
   };
 
   const handleModalSave = () => {
-    setRefreshTrigger((prev) => prev + 1);
+    setRefreshTrigger(prev => prev + 1);
     handleClose();
   };
 

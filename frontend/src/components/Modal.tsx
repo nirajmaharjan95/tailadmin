@@ -1,5 +1,5 @@
 import { LuX } from "react-icons/lu";
-import { createPortal } from 'react-dom';
+import { createPortal } from "react-dom";
 
 interface IModal {
   onClose: () => void;

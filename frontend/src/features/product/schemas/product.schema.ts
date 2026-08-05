@@ -8,14 +8,14 @@ export const productSchema = z.object({
     .string()
     .min(1, "Price is required")
     .refine(
-      (val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0,
+      val => !isNaN(parseFloat(val)) && parseFloat(val) > 0,
       "Price must be a positive number"
     ),
   stock: z
     .string()
     .min(1, "Stock is required")
     .refine(
-      (val) => !isNaN(parseInt(val)) && parseInt(val) >= 0,
+      val => !isNaN(parseInt(val)) && parseInt(val) >= 0,
       "Stock cannot be negative"
     ),
   sku: z.string().min(1, "SKU is required").max(50),

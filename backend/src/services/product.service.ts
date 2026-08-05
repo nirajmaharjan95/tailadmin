@@ -1,5 +1,6 @@
-import pool from "../config/db.js";
-import { Product, ProductInput } from "../models/product.model.js";
+import * as productRepository from "../repositories/product.repository.js";
+import { Product } from "../types/product.types.js";
+import { ProductInput } from "../validations/product.validation.js";
 
 export const getAllProducts = async (
   limit = 10,
@@ -8,43 +9,17 @@ export const getAllProducts = async (
 ): Promise<{ data: Product[]; total: number }> => {
   const pattern = `%${search}%`;
   const [dataResult, countResult] = await Promise.all([
-    pool.query(
-      `SELECT * FROM product
-       WHERE name ILIKE $3 OR category ILIKE $3
-       ORDER BY id DESC LIMIT $1 OFFSET $2`,
-      [limit, offset, pattern]
-    ),
-    pool.query(`SELECT COUNT(*) FROM product WHERE name ILIKE $1 OR category ILIKE $1`, [pattern]),
+    productRepository.findAll(limit, offset, pattern),
+    productRepository.countAll(pattern),
   ]);
-  return { data: dataResult.rows, total: Number(countResult.rows[0].count) };
+  return { data: dataResult.rows, total: countResult };
 };
 
-export const getProductById = async (id: number): Promise<Product | null> => {
-  const result = await pool.query("SELECT * FROM product WHERE id = $1", [id]);
-  return result.rows[0] ?? null;
-};
+export const getProductById = (id: number): Promise<Product | null> => productRepository.findById(id);
 
-export const createProduct = async (data: ProductInput): Promise<Product> => {
-  const { name, category, price, stock, sku, image, status } = data;
-  const result = await pool.query(
-    `INSERT INTO product (name, category, price, stock, sku, image, status)
-     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-    [name, category, price, stock, sku, image ?? null, status ?? "active"]
-  );
-  return result.rows[0];
-};
+export const createProduct = (data: ProductInput): Promise<Product> => productRepository.insert(data);
 
-export const updateProduct = async (id: number, data: ProductInput): Promise<Product | null> => {
-  const { name, category, price, stock, sku, image, status } = data;
-  const result = await pool.query(
-    `UPDATE product SET name=$1, category=$2, price=$3, stock=$4, sku=$5, image=$6, status=$7
-     WHERE id=$8 RETURNING *`,
-    [name, category, price, stock, sku, image ?? null, status ?? "active", id]
-  );
-  return result.rows[0] ?? null;
-};
+export const updateProduct = (id: number, data: ProductInput): Promise<Product | null> =>
+  productRepository.update(id, data);
 
-export const deleteProduct = async (id: number): Promise<boolean> => {
-  const result = await pool.query("DELETE FROM product WHERE id=$1 RETURNING *", [id]);
-  return result.rows.length > 0;
-};
+export const deleteProduct = (id: number): Promise<boolean> => productRepository.remove(id);

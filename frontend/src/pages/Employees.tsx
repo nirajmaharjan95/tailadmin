@@ -1,7 +1,9 @@
 import CustomBreadcrumb from "@/components/CustomBreadcrumb";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
+import ExportDownloadButton from "@/components/ExportDownloadButton";
 import Modal from "@/components/Modal";
 import Table from "@/components/Table";
+import { Button } from "@/components/ui/button";
 import AddEmployeeModal from "@/features/employee/components/AddEmployeeModal";
 import TableColumns from "@/features/employee/components/TableColumns";
 import { useEmployees } from "@/features/employee/hooks/useEmployees";
@@ -50,9 +52,13 @@ const Employees = () => {
             <div className="mb-4 flex flex-col gap-2 px-4 sm:flex-row sm:items-center sm:justify-end">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <div className="relative">
-                  <button className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 pointer-events-none"
+                  >
                     <LuSearch size={16} />
-                  </button>
+                  </Button>
                   <input
                     type="text"
                     placeholder="Search..."
@@ -62,13 +68,24 @@ const Employees = () => {
                   />
                 </div>
                 {isAdmin && (
-                  <button
-                    onClick={handleOpenAdd}
-                    className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-[11px] text-sm font-medium text-gray-700 shadow-theme-xs dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 sm:w-auto"
-                  >
-                    <MdAdd size={20} />
-                    Add New Employee
-                  </button>
+                  <div className="flex gap-2 items-center">
+                    <ExportDownloadButton
+                      variant="multi"
+                      options={["csv", "pdf", "xlsx"]}
+                      data={employees}
+                      filename="employees"
+                      excludeFields={["id", "actions"]}
+                    />
+
+                    <Button
+                      onClick={handleOpenAdd}
+                      variant="default"
+                      size={"lg"}
+                    >
+                      <MdAdd size={20} />
+                      Add New Employee
+                    </Button>
+                  </div>
                 )}
               </div>
             </div>

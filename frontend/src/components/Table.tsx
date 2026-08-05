@@ -75,12 +75,12 @@ const Table = ({
       <div className="overflow-x-auto">
         <table className="w-full table-auto">
           <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
+            {table.getHeaderGroups().map(headerGroup => (
               <tr
                 key={headerGroup.id}
                 className="border-t border-gray-200 dark:border-gray-800"
               >
-                {headerGroup.headers.map((header) => (
+                {headerGroup.headers.map(header => (
                   <th
                     key={header.id}
                     onClick={header.column.getToggleSortingHandler()}
@@ -90,10 +90,11 @@ const Table = ({
                           ? header.column.columnDef.size
                           : "auto",
                     }}
-                    className={`border-r text-left border-gray-200 px-4 py-3 dark:border-gray-800 text-theme-xs font-bold text-gray-700 dark:text-gray-400 ${header.column.getCanSort()
-                      ? "cursor-pointer select-none"
-                      : ""
-                      }`}
+                    className={`border-r text-left border-gray-200 px-4 py-3 dark:border-gray-800 text-theme-xs font-bold text-gray-700 dark:text-gray-400 ${
+                      header.column.getCanSort()
+                        ? "cursor-pointer select-none"
+                        : ""
+                    }`}
                   >
                     {header.isPlaceholder ? null : (
                       <span className="flex items-center gap-1">
@@ -118,50 +119,50 @@ const Table = ({
           <tbody>
             {isLoading
               ? Array.from({ length: pagination.pageSize }).map((_, i) => (
-                <tr
-                  key={i}
-                  className="border-t border-gray-200 dark:border-gray-800"
-                >
-                  {table.getAllLeafColumns().map((col) => (
-                    <td
-                      key={col.id}
-                      className="border-r border-gray-200 px-4 py-3 dark:border-gray-800"
-                      style={{
-                        width:
-                          col.columnDef.size !== undefined
-                            ? col.columnDef.size
-                            : "auto",
-                      }}
-                    >
-                      <Skeleton className="h-4 w-full" />
-                    </td>
-                  ))}
-                </tr>
-              ))
-              : table.getRowModel().rows.map((row) => (
-                <tr
-                  key={row.id}
-                  className="border-t border-gray-200 dark:border-gray-800"
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <td
-                      key={cell.id}
-                      style={{
-                        width:
-                          cell.column.columnDef.size !== undefined
-                            ? cell.column.columnDef.size
-                            : "auto",
-                      }}
-                      className="border-r border-gray-200 px-4 py-3 dark:border-gray-800 text-theme-xs font-medium text-gray-700 dark:text-gray-400"
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
+                  <tr
+                    key={i}
+                    className="border-t border-gray-200 dark:border-gray-800"
+                  >
+                    {table.getAllLeafColumns().map(col => (
+                      <td
+                        key={col.id}
+                        className="border-r border-gray-200 px-4 py-3 dark:border-gray-800"
+                        style={{
+                          width:
+                            col.columnDef.size !== undefined
+                              ? col.columnDef.size
+                              : "auto",
+                        }}
+                      >
+                        <Skeleton className="h-4 w-full" />
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              : table.getRowModel().rows.map(row => (
+                  <tr
+                    key={row.id}
+                    className="border-t border-gray-200 dark:border-gray-800"
+                  >
+                    {row.getVisibleCells().map(cell => (
+                      <td
+                        key={cell.id}
+                        style={{
+                          width:
+                            cell.column.columnDef.size !== undefined
+                              ? cell.column.columnDef.size
+                              : "auto",
+                        }}
+                        className="border-r border-gray-200 px-4 py-3 dark:border-gray-800 text-theme-xs font-medium text-gray-700 dark:text-gray-400"
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
           </tbody>
         </table>
       </div>

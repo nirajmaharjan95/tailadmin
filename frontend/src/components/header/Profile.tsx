@@ -1,17 +1,21 @@
+import Modal from "@/components/Modal";
+import ChangePasswordModal from "@/features/authentication/components/ChangePasswordModal";
+import { useAuth } from "@/features/authentication/hooks/useAuth";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
-import { useAuth, useUser } from "@clerk/clerk-react";
 import { useCallback, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const { isSignedIn, user, isLoaded } = useUser();
-  const { signOut } = useAuth();
+  const { status, user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const handleToggleProfileMenu = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
       e.preventDefault();
-      setIsProfileMenuOpen((prev) => !prev);
+      setIsProfileMenuOpen(prev => !prev);
     },
     []
   );
@@ -21,19 +25,21 @@ const Profile = () => {
     onClickOutside: () => setIsProfileMenuOpen(false),
   });
 
-  if (!isLoaded) return <div>Loading...</div>;
-  if (!isSignedIn) return <div>Sign in to view this page</div>;
+  if (status === "loading") return <div>Loading...</div>;
+  if (status !== "authenticated" || !user)
+    return <div>Sign in to view this page</div>;
 
   const handleSignOut = async () => {
-    await signOut({ redirectUrl: "/signin" });
+    await signOut();
     setIsProfileMenuOpen(false);
+    navigate("/signin");
   };
 
   return (
     <div ref={ref} className="relative">
       <a
         className="cursor-pointer flex items-center text-gray-700 dark:text-gray-400"
-        onClick={(e) => handleToggleProfileMenu(e)}
+        onClick={e => handleToggleProfileMenu(e)}
       >
         <span className="mr-3 h-11 w-11 overflow-hidden rounded-full">
           <img
@@ -43,7 +49,7 @@ const Profile = () => {
         </span>
 
         <span className="text-theme-sm mr-1 block font-medium">
-          {user?.firstName}
+          {user.firstName}
         </span>
 
         <svg
@@ -68,10 +74,10 @@ const Profile = () => {
         <div className="shadow-theme-lg dark:bg-gray-dark absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 dark:border-gray-800">
           <div>
             <span className="text-theme-sm block font-medium text-gray-700 dark:text-gray-400">
-              {user.fullName}
+              {`${user.firstName} ${user.lastName}`}
             </span>
             <span className="text-theme-xs mt-0.5 block text-gray-500 dark:text-gray-400">
-              {user.emailAddresses[0].emailAddress}
+              {user.email}
             </span>
           </div>
 
@@ -100,9 +106,13 @@ const Profile = () => {
               </a>
             </li>
             <li>
-              <a
-                href="chat.html"
-                className="group text-theme-sm flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
+              <button
+                type="button"
+                onClick={() => {
+                  setIsProfileMenuOpen(false);
+                  setIsChangePasswordOpen(true);
+                }}
+                className="group text-theme-sm flex w-full items-center gap-3 rounded-lg px-3 py-2 font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
               >
                 <svg
                   className="fill-gray-500 group-hover:fill-gray-700 dark:fill-gray-400 dark:group-hover:fill-gray-300"
@@ -120,7 +130,7 @@ const Profile = () => {
                   ></path>
                 </svg>
                 Account settings
-              </a>
+              </button>
             </li>
             <li>
               <a
@@ -168,6 +178,12 @@ const Profile = () => {
             Sign out
           </button>
         </div>
+      )}
+
+      {isChangePasswordOpen && (
+        <Modal onClose={() => setIsChangePasswordOpen(false)}>
+          <ChangePasswordModal onClose={() => setIsChangePasswordOpen(false)} />
+        </Modal>
       )}
     </div>
   );

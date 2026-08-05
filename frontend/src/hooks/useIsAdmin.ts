@@ -1,6 +1,6 @@
-import { useUser } from "@clerk/clerk-react";
+import { useAuth } from "@/features/authentication/hooks/useAuth";
 
 export const useIsAdmin = () => {
-  const { user } = useUser();
-  return user?.publicMetadata?.role === "admin";
+  const { user } = useAuth();
+  return user?.role === "admin";
 };

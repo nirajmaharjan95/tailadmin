@@ -1,12 +1,7 @@
 import { Request, Response } from 'express';
-import { employeeSchema } from '../models/employee.model.js';
 import * as employeeService from '../services/employee.service.js';
-
-const parseErrors = (issues: Array<{ path: PropertyKey[]; message: string }>) =>
-  issues.reduce<Record<string, string>>((acc, issue) => {
-    acc[issue.path.join('.')] = issue.message;
-    return acc;
-  }, {});
+import { parseErrors } from '../utils/parse-errors.js';
+import { employeeSchema } from '../validations/employee.validation.js';
 
 export const getAll = async (req: Request, res: Response) => {
   try {

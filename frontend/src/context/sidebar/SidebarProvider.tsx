@@ -13,7 +13,7 @@ export const SidebarProvider = ({ children }: { children: ReactNode }) => {
   }, [isSidebarOpen]);
 
   const toggle = useCallback(() => {
-    setIsSidebarOpen((prev) => !prev);
+    setIsSidebarOpen(prev => !prev);
   }, []);
 
   const close = useCallback(() => {

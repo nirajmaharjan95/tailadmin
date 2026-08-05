@@ -1,4 +1,5 @@
 import { notifications } from "@/constants/notificationList";
+import { Button } from "@/components/ui/button";
 import { CircleUserRound } from "lucide-react";
 import { useState } from "react";
 
@@ -11,7 +12,7 @@ const NotificationDropdown = ({ isOpen, onClose }: Props) => {
   const [imgErrors, setImgErrors] = useState<Record<number, boolean>>({});
 
   const handleImgError = (id: number) => {
-    setImgErrors((prev) => ({ ...prev, [id]: true }));
+    setImgErrors(prev => ({ ...prev, [id]: true }));
   };
 
   if (!isOpen) return null;
@@ -22,7 +23,12 @@ const NotificationDropdown = ({ isOpen, onClose }: Props) => {
         <h5 className="text-lg font-semibold text-gray-800 dark:text-white/90">
           Notification
         </h5>
-        <button onClick={onClose} className="text-gray-500 dark:text-gray-400">
+        <Button
+          onClick={onClose}
+          variant="ghost"
+          size="icon-sm"
+          className="text-gray-500 dark:text-gray-400"
+        >
           <svg
             className="fill-current"
             width="24"
@@ -38,11 +44,11 @@ const NotificationDropdown = ({ isOpen, onClose }: Props) => {
               fill=""
             ></path>
           </svg>
-        </button>
+        </Button>
       </div>
 
       <ul className="custom-scrollbar flex h-auto flex-col overflow-y-auto">
-        {notifications.map((item) => (
+        {notifications.map(item => (
           <li key={item.id}>
             <a
               className="flex gap-3 rounded-lg border-b border-gray-100 p-3 px-4.5 py-3 hover:bg-gray-100 dark:border-gray-800 dark:hover:bg-white/5"

@@ -1,13 +1,34 @@
-import { CheckLine } from "lucide-react";
+import { CheckLine, GraduationCap, LayoutDashboard, Users } from "lucide-react";
+import type { ReactNode } from "react";
 import { LuShoppingCart, LuSquareUserRound } from "react-icons/lu";
 import { Link, NavLink } from "react-router-dom";
+import type { UserRole } from "../features/authentication/types/auth.types";
+import { useIsAdmin } from "../hooks/useIsAdmin";
 import { useSidebar } from "../hooks/useSidebar";
 
-const navItems = [
+interface NavItem {
+  label: string;
+  path: string;
+  icon: ReactNode;
+  viewby?: UserRole;
+}
+
+const navItems: NavItem[] = [
+  {
+    label: "Dashboard",
+    path: "/dashboard",
+    icon: <LayoutDashboard size={24} />,
+  },
   {
     label: "Employees",
     path: "/employees",
     icon: <LuSquareUserRound size={24} />,
+  },
+  {
+    label: "Users",
+    path: "/users",
+    icon: <Users size={24} />,
+    viewby: "admin",
   },
   {
     label: "Products",
@@ -19,10 +40,20 @@ const navItems = [
     path: "/tasks",
     icon: <CheckLine size={24} />,
   },
+  {
+    label: "Courses",
+    path: "/courses",
+    icon: <GraduationCap size={24} />,
+  },
 ];
 
 const Sidebar = () => {
   const { isSidebarOpen } = useSidebar();
+  const isAdmin = useIsAdmin();
+
+  const visibleNavItems = navItems.filter(
+    item => item.viewby !== "admin" || isAdmin
+  );
 
   return (
     <aside
@@ -64,7 +95,7 @@ const Sidebar = () => {
               <span className="menu-group-title dark:text-white/90">MENU</span>
             </h3>
             <ul className="mb-6 flex flex-col gap-1">
-              {navItems.map((item, index) => {
+              {visibleNavItems.map((item, index) => {
                 return (
                   <li key={index}>
                     <NavLink

@@ -1,9 +1,11 @@
 import { IEmployee } from "@/features/employee/types/employee.types";
 import { IProduct } from "@/features/product/types/product.types";
+import { IUser } from "@/features/user/types/user.types";
 
 interface IDeleteConfirmModal {
   employee?: IEmployee;
   product?: IProduct;
+  user?: IUser;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -11,19 +13,21 @@ interface IDeleteConfirmModal {
 const DeleteConfirmModal = ({
   employee,
   product,
+  user,
   onConfirm,
   onCancel,
 }: IDeleteConfirmModal) => {
   return (
     <div className="text-center">
       <h2 className="mb-4 text-xl font-semibold text-gray-800 dark:text-white/90">
-        Delete {employee && "Employee"} {product && "Product"}
+        Delete {employee && "Employee"} {product && "Product"} {user && "User"}
       </h2>
       <p className="mb-6 text-gray-600 dark:text-gray-400">
         Are you sure you want to delete{" "}
         <span className="font-medium">
           {employee && `${employee?.first_name} ${employee?.last_name}`}
           {product && product.name}
+          {user && `${user.firstName} ${user.lastName}`}
         </span>
         ? This action cannot be undone.
       </p>

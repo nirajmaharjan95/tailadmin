@@ -1,11 +1,11 @@
 import { onError, onSuccess } from "@/utils/toast";
-import { useSignIn } from "@clerk/clerk-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { signinSchema } from "../schema/signinSchema";
+import { useAuth } from "./useAuth";
 export type SigninFormData = z.infer<typeof signinSchema>;
 
 interface UseSigninFormReturn {
@@ -35,28 +35,18 @@ export const useSigninForm = (): UseSigninFormReturn => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const togglePassword = () => setShowPassword((prev) => !prev);
+  const togglePassword = () => setShowPassword(prev => !prev);
 
-  const { isLoaded, signIn, setActive } = useSignIn();
+  const { signIn } = useAuth();
+
   const navigate = useNavigate();
 
   const onSubmit = async (data: SigninFormData): Promise<void> => {
-    if (!isLoaded || !signIn) return;
-
     setIsLoading(true);
     try {
-      const result = await signIn.create({
-        strategy: "password",
-        identifier: data.email,
-        password: data.password,
-      });
-
-      if (result.status === "complete" && result.createdSessionId) {
-        await setActive({ session: result.createdSessionId });
-      }
-
+      await signIn({ email: data.email, password: data.password });
       onSuccess("Signed in successfully");
-      navigate("/employees");
+      navigate("/dashboard");
       reset();
     } catch (err) {
       onError(err, "Failed to sign in. Please try again.");

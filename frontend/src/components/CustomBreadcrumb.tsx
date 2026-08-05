@@ -14,7 +14,7 @@ interface CustomBreadcrumbProps {
 }
 
 const segmentToLabel = (segment: string) =>
-  segment.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  segment.replace(/[-_]/g, " ").replace(/\b\w/g, c => c.toUpperCase());
 
 const CustomBreadcrumb = ({ className }: CustomBreadcrumbProps) => {
   const { pathname } = useLocation();

@@ -8,7 +8,7 @@ export const signupSchema = z
     password: z.string().min(8, "Password must be at least 8 characters"),
     terms: z
       .boolean()
-      .refine((val) => val === true, "You must agree to the terms"),
+      .refine(val => val === true, "You must agree to the terms"),
   })
   .required();
 

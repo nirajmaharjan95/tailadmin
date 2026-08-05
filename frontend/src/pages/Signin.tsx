@@ -1,6 +1,4 @@
 import AuthSidePannel from "@/features/authentication/components/AuthSidePannel";
-import OAuthButtons from "@/features/authentication/components/OAuthButtons";
-import OrDivider from "@/features/authentication/components/OrDivider";
 import SigninForm from "@/features/authentication/components/SigninForm";
 import { Link } from "react-router-dom";
 
@@ -19,17 +17,6 @@ const Signin = () => {
                   Enter your email and password to sign in!
                 </p>
               </div>
-
-              <OAuthButtons
-                onGoogleSignup={() => {
-                  console.log("Google");
-                }}
-                onXTwitterSignup={() => {
-                  console.log("XTwitter");
-                }}
-              />
-
-              <OrDivider />
 
               <SigninForm />
 
